@@ -17,7 +17,6 @@ interface IERC20Token {
 
 contract CrowdFund {
 
-
 /* Requirements:
 -  Anyone can create a new campaign.
 -  Multiple campaigns can be created by single owner.
@@ -26,15 +25,12 @@ contract CrowdFund {
 - Campaign owner can withdraw funds only when required funding goal has been achieved (can withdraw before deadline has passed if funding goal is achieved).
 - A Campaign is closed when:
             * deadline has passed (not closed when target goal amount is reached as campaign owner can collect more funds than the initial target) or 
-            * Campaign owner withdraws funds  
             * Any time by the Campaign Owner for any reason.
-- Each contributor can only claim refunds:
-            * if deadline has passed and the required funding goal has not been achieved or
-            *  if the deadline has not passed and the required funding goal has also not been achieved but the campaign has still been closed by the owner 
-*/
+            */
 
     address payable public owner; //owner of contract
     uint256 public totalCampaigns;//no. of campaigns
+    
     // cusd token address
     address internal cUsdTokenAddress = 0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1;
 
@@ -59,11 +55,13 @@ contract CrowdFund {
     // This declares a state variable campaigns that stores a `Campaign` struct for each unique campaign ID.
     mapping(uint256 => Campaign) campaigns;
 
+    // modifier to ensure only the contract owner can call a function
     modifier onlyOwner {
         require(msg.sender == owner,"Only owner can call this function.");
         _;
     }
 
+// modifier to ensure only project owner can call a function
     modifier onlyCampaignOwner(uint256 _campaignID) {
         require(msg.sender == campaigns[_campaignID].campaignOwner,"Only Campaign owner can call this function.");
         _;
@@ -78,6 +76,7 @@ contract CrowdFund {
     //Creation of a campaign
     function createCampaign(string memory _campaignTitle, string memory _campaignDescription, uint256 _goalAmount, uint256 _fundingPeriodInDays ) public {
 
+       require(bytes(_campaignTitle).length !=0 && bytes(_campaignDescription).length !=0, 'Campaign Title and description cannot be empty!');
         require(_goalAmount > 0, 'Goal amount must be more than zero cusd!');
         require(_fundingPeriodInDays >=1 && _fundingPeriodInDays <=365, 'Funding Period should be between 1 -365 days');
 
@@ -116,6 +115,10 @@ contract CrowdFund {
 
     //Funding of a campaign
     function fundCampaign(uint256 _campaignID, uint256 _price) public payable{
+        
+        require(_price > 0, 'You must fund above 0 cusd');
+        require(campaigns[_campaignID].isExists,'This project does not exists');
+        require(campaigns[_campaignID].isCampaignOpen, 'This project has been closed or ended');
  
         checkCampaignDeadline(_campaignID);
         
@@ -126,7 +129,7 @@ contract CrowdFund {
             _price
            
           ),
-          "Donation failed."
+          "funding this project has failed."
         );
 
         campaigns[_campaignID].contributions[msg.sender] = (campaigns[_campaignID].contributions[msg.sender]) + _price;
@@ -161,7 +164,7 @@ contract CrowdFund {
     //To check whether a campaign deadline has passed
     function checkCampaignDeadline(uint256 _campaignID)  internal {
         
-        require(campaigns[_campaignID].isExists,'Campaign does not exists');
+        require(campaigns[_campaignID].isExists,'This p does not exists');
         
         if (now > campaigns[_campaignID].deadline){
             campaigns[_campaignID].isCampaignOpen = false;//Close the campaign

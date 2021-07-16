@@ -7,7 +7,7 @@ import Modal from "react-modal";
 import erc20Abi from "./contracts/erc20.abi.json";
 import crowdfunding_abi from "./contracts/Crowdfunding.abi.json";
 const celo_address = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
-const crowdfunding_address = "0x981029d3650A07501AEAF8D91502a01d9A7A633A";
+const crowdfunding_address = "0x7EC6c1FE083621ece6F75D998A060C912486AAF7";
 
 const App = () => {
   const [loading, setloading] = useState(false);
