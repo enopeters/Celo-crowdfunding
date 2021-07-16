@@ -1,0 +1,106 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('../fonts/icomoon.eot?esr9ov');
+  src:  url('../fonts/icomoon.eot?esr9ov#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon.ttf?esr9ov') format('truetype'),
+    url('../fonts/icomoon.woff?esr9ov') format('woff'),
+    url('../fonts/icomoon.svg?esr9ov#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-magnifying-glass:before {
+  content: "\e900";
+}
+.icon-shopping-cart:before {
+  content: "\e901";
+}
+.icon-left-arrow:before {
+  content: "\e902";
+  color: #5286fa;
+}
+.icon-cosmetics:before {
+  content: "\e903";
+}
+.icon-stethoscope:before {
+  content: "\e904";
+}
+.icon-jigsaw:before {
+  content: "\e905";
+}
+.icon-video-player:before {
+  content: "\e906";
+}
+.icon-robot:before {
+  content: "\e907";
+}
+.icon-creativity:before {
+  content: "\e908";
+}
+.icon-save-money:before {
+  content: "\e909";
+}
+.icon-volunteer:before {
+  content: "\e90a";
+}
+.icon-rating:before {
+  content: "\e90b";
+}
+.icon-money:before {
+  content: "\e90c";
+}
+.icon-progress:before {
+  content: "\e90d";
+}
+.icon-target:before {
+  content: "\e90e";
+}
+.icon-team:before {
+  content: "\e90f";
+}
+.icon-list:before {
+  content: "\e910";
+}
+.icon-mission:before {
+  content: "\e911";
+}
+.icon-employees:before {
+  content: "\e912";
+}
+.icon-book:before {
+  content: "\e913";
+}
+.icon-plus-symbol:before {
+  content: "\e914";
+}
+.icon-mouse:before {
+  content: "\e915";
+}
+.icon-leader:before {
+  content: "\e916";
+}
+.icon-maze:before {
+  content: "\e917";
+}
+.icon-goal:before {
+  content: "\e918";
+}
+.icon-conversation:before {
+  content: "\e919";
+}
