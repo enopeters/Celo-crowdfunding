@@ -3,9 +3,13 @@ import { newKitFromWeb3 } from "@celo/contractkit";
 import "@celo-tools/use-contractkit/lib/styles.css";
 import Web3 from "@celo/contractkit/node_modules/web3";
 import BigNumber from "bignumber.js";
-import Modal from "react-modal";
 import erc20Abi from "./contracts/erc20.abi.json";
 import crowdfunding_abi from "./contracts/Crowdfunding.abi.json";
+
+// react notification library imports
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const celo_address = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
 const crowdfunding_address = "0x7EC6c1FE083621ece6F75D998A060C912486AAF7";
 
@@ -30,6 +34,7 @@ const App = () => {
   const connectCeloWallet = async () => {
     if (window.celo) {
       try {
+        
         await window.celo.enable();
         const web3 = new Web3(window.celo);
         let kit = newKitFromWeb3(web3);
@@ -42,12 +47,13 @@ const App = () => {
         await setAddress(user_address);
 
         await setKit(kit);
-        console.log("all set");
+        toast.success("Connected to the celo blockchain successfully");
       } catch (error) {
         console.log({ error });
+        toast.error("Failed to connect to the celo blockchain")
       }
     } else {
-      console.log("please install the extension");
+      toast.error("Please install the celo wallet extension to use this Dapp")
     }
   };
 
@@ -58,36 +64,48 @@ const App = () => {
         crowdfunding_address
       );
       setcontract(contract);
-    } else {
-      console.log("no kit or address");
-    }
+    } 
   }, [kit, address]);
 
   const fund_project = async (campaign_id, amount) => {
-    const cUSDContract = new kit.web3.eth.Contract(erc20Abi, celo_address);
+    try {
+      const cUSDContract = new kit.web3.eth.Contract(erc20Abi, celo_address);
 
-    const donation_price = BigNumber(amount)
-      .shiftedBy(ERC20_DECIMALS)
-      .toString();
-
-    console.log({ donation_price });
-    const result = await cUSDContract.methods
-      .approve(crowdfunding_address, donation_price)
-      .send({ from: address });
-
-    await contract.methods
-      .fundCampaign(campaign_id, amount)
-      .send({ from: address });
-    // return result
-    await getCampaigns();
+      const donation_price = BigNumber(amount)
+        .shiftedBy(ERC20_DECIMALS)
+        .toString();
+  
+      const result = await cUSDContract.methods
+        .approve(crowdfunding_address, donation_price)
+        .send({ from: address });
+  
+      await contract.methods
+        .fundCampaign(campaign_id, amount)
+        .send({ from: address });
+        toast.success("Funded this campaign successfully")
+      // return result
+      await getCampaigns();
+    } catch (error) {
+      console.log({error})
+    toast.warning("Failed to fund this project")
+    }
+   
   };
 
   const close_campaign = async (campaign_id) => {
-    await contract.methods.closeCampaign(campaign_id).send({ from: address });
-    // return result
-    await getCampaigns();
+    try {
+      await contract.methods.closeCampaign(campaign_id).send({ from: address });
+      toast.info("You have successfully closed the campaign")
+      // return result
+      await getCampaigns();
+    } catch (error) {
+      toast.error("failed to close project")
+    }
+ 
   };
 
+
+  // fetch all the currently running projects
   const getCampaigns = async () => {
     const length_of_campaigns = await contract.methods.totalCampaigns().call();
     console.log({ length_of_campaigns });
@@ -114,30 +132,45 @@ const App = () => {
     const resloved_campaigns = await Promise.all(_campaigns);
 
     setcampaigns(resloved_campaigns);
+    toast.success("Fetched updated projects")
   };
 
-  const createCampaign = async() => {
+  const createCampaign = async () => {
     if (!title || !description || !goal || !time) {
-      return alert("Please enter all fields");
+      return toast.error("Please enter all fields")
     }
 
     await contract.methods
       .createCampaign(title, description, goal, time)
       .send({ from: address });
     // return result
+
+    toast.success("Your project has been created successfully")
     await getCampaigns();
   };
 
   useEffect(() => {
     if (contract) {
       return getCampaigns();
-      // testget()
     }
   }, [contract]);
 
   return (
     <div>
-     
+      {/* toast library container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      {/* toast library container end */}
+
       <div className="page-wrapper">
         <div className="site_header__header_two_wrap clearfix">
           <div className="header_top_two">
@@ -149,19 +182,14 @@ const App = () => {
                       <h2>Celo Crowdfunding</h2>
                     </a>
                   </div>
-                  {/* <div className="one__social">
-                <a href="#"><i className="fab fa-facebook-square" /></a>
-                <a href="#"><i className="fab fa-twitter" /></a>
-                <a href="#"><i className="fab fa-instagram" /></a>
-                <a href="#"><i className="fab fa-dribbble" /></a>
-              </div> */}
+               
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/*Create Own Start*/}
+  
         {/*Explore Projects One Start*/}
         <section className="explorep_projects_one projects_two">
           <div
@@ -221,8 +249,7 @@ const App = () => {
                         </li>
                         <li>
                           <h5>
-                            {new BigNumber(campaign.goal_amount)
-                              .toString()}{" "}
+                            {new BigNumber(campaign.goal_amount).toString()}{" "}
                             cUsd
                           </h5>
                           <p>Goal</p>
@@ -331,8 +358,8 @@ const App = () => {
                         type="text"
                         name="title"
                         required
-                        onChange={(e)=>{
-                          settitle(e.target.value)
+                        onChange={(e) => {
+                          settitle(e.target.value);
                         }}
                         placeholder="Campaign Title"
                       />
@@ -341,8 +368,8 @@ const App = () => {
                       <input
                         type="text"
                         name="description"
-                        onChange={(e)=>{
-                          setdescription(e.target.value)
+                        onChange={(e) => {
+                          setdescription(e.target.value);
                         }}
                         required
                         placeholder="short description"
@@ -353,8 +380,8 @@ const App = () => {
                         type="text"
                         name="goal"
                         required
-                        onChange={(e)=>{
-                          setgoal(e.target.value)
+                        onChange={(e) => {
+                          setgoal(e.target.value);
                         }}
                         placeholder="Campaign Goal in cUSD"
                       />
@@ -363,14 +390,14 @@ const App = () => {
                       <input
                         type="text"
                         required
-                        onChange={(e)=>{
-                          settime(e.target.value)
+                        onChange={(e) => {
+                          settime(e.target.value);
                         }}
                         name="period"
                         placeholder="Time for campaign to run(in days)"
                       />
                     </div>
-                   
+
                     <button type="submit" className="thm-btn cta_sign_up">
                       Create Campaign
                     </button>
