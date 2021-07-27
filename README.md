@@ -1,4 +1,3 @@
-# Getting Started with Create React App
 
 Link to completed dapp : 
 # https://fierce-thicket-82163.herokuapp.com/
